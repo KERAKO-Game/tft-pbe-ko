@@ -254,6 +254,8 @@ main { padding-block: 4px 56px; }
 .toast.show { opacity: 1; transform: translate(-50%, 0); }
 @media (prefers-reduced-motion: reduce) { .hex.pop, .hex.sel, .trow.up, .trow.s5 .thex { animation: none; } .toast { transition: none; } }
 
+.pickbar { margin: 16px 0 0; padding: 8px 8px 8px 14px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; border-radius: 12px; background: var(--accent-soft); font-size: 14px; }
+
 /* Terms, empty, notes */
 .term { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; min-width: 0; }
 .term b { font-weight: 700; margin-right: 8px; }
@@ -310,6 +312,8 @@ main { padding-block: 4px 56px; }
     <li><abbr class="kw">피해 증폭</abbr> 점선 낱말은 올려 두면 뜻이 뜨고, 「용어」 탭에도 있음</li>
     <li>특성 · 챔피언 칩을 누르면 그 항목으로 이동</li>
   </ul>
+
+  <p class="pickbar" id="pickbar" hidden></p>
 
   <section id="view-champs" aria-labelledby="tab-champs"></section>
   <section id="view-traits" aria-labelledby="tab-traits" hidden></section>
@@ -490,6 +494,9 @@ function apply() {
   $('#tiers').hidden = state.tab !== 'augs';
   document.querySelectorAll('.costbtn').forEach((b) => b.setAttribute('aria-pressed', String(Number(b.dataset.cost) === state.cost)));
   document.querySelectorAll('.tierbtn').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.tier === state.tier)));
+  const pb = $('#pickbar');
+  pb.hidden = !state.pick;
+  if (state.pick) pb.innerHTML = '<span><b>' + esc(state.pickName || state.pick) + '</b>만 보는 중</span><button class="btn go" type="button" data-unpick>전체 보기</button>';
   const filtered = !!(words.length || state.pick);
   document.querySelectorAll('.strip').forEach((s) => { s.hidden = filtered; });
   $('#matrix').hidden = filtered;
@@ -524,6 +531,7 @@ document.addEventListener('click', (e) => {
   if (dt) { dtrait = dtrait === dt.dataset.dtrait ? '' : dt.dataset.dtrait; apply(); renderDeck(false); return; }
   const em = e.target.closest('[data-emb]');
   if (em) { deck.emb[em.dataset.emb] = Math.max(0, (deck.emb[em.dataset.emb] || 0) + Number(em.dataset.d)); renderDeck(true); return; }
+  if (e.target.closest('[data-unpick]')) { state.pick = null; apply(); return; }
   const tab = e.target.closest('.tab');
   if (tab) { state.tab = tab.dataset.tab; state.pick = null; apply(); return; }
   const tier = e.target.closest('.tierbtn');
@@ -538,8 +546,8 @@ document.addEventListener('click', (e) => {
   }
   const go = e.target.closest('[data-go]');
   if (go) {
-    state.tab = go.dataset.go; state.pick = go.dataset.key; state.q = go.dataset.q; state.cost = 0; state.tier = '';
-    $('#q').value = state.q; apply();
+    state.tab = go.dataset.go; state.pick = go.dataset.key; state.pickName = go.dataset.q; state.q = ''; state.cost = 0; state.tier = '';
+    $('#q').value = ''; apply();
     window.scrollTo({ top: 0 });
   }
 });
