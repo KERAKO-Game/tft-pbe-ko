@@ -297,6 +297,41 @@ main { padding-block: 4px 56px; }
 .ee { font-weight: 700; font-size: 16px; color: var(--accent); }
 @media (max-width: 520px) { .erow { grid-template-columns: 26px minmax(0, 1fr) repeat(4, 34px); gap: 5px; padding-inline: 4px; } .erow .thex { width: 26px; height: 30px; } .ev { font-size: 13px; } .ee { font-size: 14.5px; } }
 
+.btools { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; margin-top: 10px; }
+.btools .lv { margin-right: 0; }
+.bt-right { margin-left: auto; display: inline-flex; flex-wrap: wrap; gap: 6px; }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 9px; overflow: hidden; }
+.seg button { border: 0; background: var(--surface-2); padding: 6px 8px; cursor: pointer; font-size: 12px; letter-spacing: -1px; color: #c9971f; }
+.seg button + button { border-left: 1px solid var(--line); }
+.seg button[aria-pressed="true"] { background: var(--accent-soft); box-shadow: inset 0 0 0 1px var(--accent); }
+.btn:disabled { opacity: .45; cursor: default; }
+.d-board { background-image: radial-gradient(120% 70% at 50% 0%, var(--accent-soft), transparent 72%); }
+.hex, .pick, .nx { user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
+.hex.has { touch-action: none; cursor: grab; }
+.hex.lift { opacity: .3; }
+.hex .hn { display: none; position: absolute; left: 6%; right: 6%; bottom: 15%; text-align: center; font-size: 10px; line-height: 1.1; font-weight: 600; color: #fff; text-shadow: 0 1px 2px #000, 0 0 3px #000; overflow: hidden; white-space: nowrap; pointer-events: none; }
+@media (min-width: 600px) { .hex .hn { display: block; } .hex .st { bottom: auto; top: 12%; } }
+.ghost { position: fixed; z-index: 30; pointer-events: none; width: 58px; height: 58px; margin: -29px 0 0 -29px; border-radius: 14px; box-shadow: 0 8px 20px rgba(0, 0, 0, .45), 0 0 0 2px var(--kc); opacity: .96; }
+.ghost .sp-sq { --w: 58px; --h: 58px; border-radius: 14px; }
+.tfilter { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 10px; }
+.tf { flex: none; border: 1px solid var(--line); background: var(--surface-2); border-radius: 999px; padding: 2px 9px 2px 6px; font-size: 12.5px; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; }
+.tf .sp-trait { --w: 13px; --h: 13px; }
+.tf:hover { border-color: var(--accent); }
+.tf.on { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+.tf.on .sp-trait { filter: invert(calc(1 - var(--inv))); }
+.pick .pt { display: flex; gap: 2px; height: 11px; }
+.pick .pt .sp-trait { --w: 11px; --h: 11px; opacity: .7; }
+@media (max-width: 520px) {
+  .tfilter { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 4px; }
+  .d-board { padding: 10px 12px; }
+  .dchips, .scorebar { flex-wrap: nowrap; overflow-x: auto; }
+  .dchips > *, .scorebar > * { flex: none; }
+  .dchips { margin-top: 4px; }
+  .scorebar { margin-top: 6px; }
+  .sc { padding: 2px 8px; }
+  .sc b { font-size: 14px; }
+}
+
 .pickbar { margin: 16px 0 0; padding: 8px 8px 8px 14px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; border-radius: 12px; background: var(--accent-soft); font-size: 14px; }
 
 /* Terms, empty, notes */
@@ -368,22 +403,25 @@ main { padding-block: 4px 56px; }
         <div class="panel d-info">
           <div class="deck-top">
             <input id="deck-name" type="text" maxlength="24" autocomplete="off" placeholder="덱 이름을 지어 보세요" aria-label="덱 이름">
+            <button class="btn" type="button" data-act="share">링크 복사</button>
+          </div>
+          <div class="btools">
+            <span class="lv"><button class="btn" type="button" data-act="lv-" aria-label="레벨 내리기">−</button><span id="deck-lv"></span><button class="btn" type="button" data-act="lv+" aria-label="레벨 올리기">+</button></span>
             <span class="stat" id="deck-count"></span>
             <span class="stat" id="deck-gold"></span>
+            <span class="bt-right">
+              <span class="seg" role="group" aria-label="모든 챔피언 별 레벨"><button type="button" data-allstar="1" title="모두 1성으로">★</button><button type="button" data-allstar="2" title="모두 2성으로">★★</button><button type="button" data-allstar="3" title="모두 3성으로">★★★</button></span>
+              <button class="btn" type="button" data-act="undo" id="btn-undo" title="되돌리기 (Ctrl+Z)">되돌리기</button>
+              <button class="btn" type="button" data-act="clear">비우기</button>
+            </span>
           </div>
-          <div class="deck-actions">
-            <span class="lv"><button class="btn" type="button" data-act="lv-" aria-label="레벨 내리기">−</button><span id="deck-lv"></span><button class="btn" type="button" data-act="lv+" aria-label="레벨 올리기">+</button></span>
-            <button class="btn go" type="button" data-act="random">랜덤 덱</button>
-            <button class="btn" type="button" data-act="share">링크 복사</button>
-            <button class="btn" type="button" data-act="clear">비우기</button>
-          </div>
-          <div class="scorebar" id="scorebar" aria-label="지금 덱 점수"></div>
           <div class="ai">
             <div class="ai-head"><b>추천 덱 짜기</b><span>특성 효과를 점수로 바꿔 계산한 추정입니다</span></div>
             <div class="ai-btns">
               <button class="btn go" type="button" data-ai="all">종합 추천</button>
               <button class="btn" type="button" data-ai="tank">안정 (탱킹)</button>
               <button class="btn" type="button" data-ai="dmg">딜 중심</button>
+              <button class="btn" type="button" data-act="random">랜덤</button>
             </div>
             <div class="ai-opts">
               <label><input type="checkbox" id="ai-keep" checked> 판 위 챔피언은 그대로</label>
@@ -391,14 +429,15 @@ main { padding-block: 4px 56px; }
             </div>
             <p class="ai-out" id="ai-out"></p>
           </div>
-          <p class="hint" id="deck-hint">챔피언을 누르면 역할에 맞는 줄에 올라갑니다. 판 위의 챔피언을 누른 뒤 다른 칸을 누르면 옮겨지고, 끌어서 옮겨도 됩니다.</p>
         </div>
         <div class="panel d-board">
           <p class="side">▲ 앞줄 (적 쪽)</p>
           <div class="board" id="board" aria-label="배치판"></div>
           <p class="side">뒷줄 ▼</p>
           <div class="dchips" id="deck-chips" aria-label="켜진 시너지"></div>
+          <div class="scorebar" id="scorebar" aria-label="지금 덱 점수"></div>
           <div class="unit-bar" id="unit-bar" hidden></div>
+          <p class="hint" id="deck-hint">누르면 빠지고, 끌면 옮겨집니다. 판 밖으로 끌어내도 빠집니다. 길게 누르거나 오른쪽 클릭하면 별 레벨과 설명이 나옵니다.</p>
         </div>
         <div class="panel d-traits">
           <div class="trows" id="deck-traits"></div>
@@ -406,6 +445,7 @@ main { padding-block: 4px 56px; }
       </div>
       <div class="panel d-pick">
         <div class="nexts" id="ai-next"></div>
+        <div class="tfilter" id="tfilter" aria-label="특성으로 거르기"></div>
         <p class="pick-note" id="pick-note"></p>
         <div id="pick-list"></div>
       </div>
@@ -537,7 +577,8 @@ function render() {
   $('#n-augs').textContent = D.n.augNames;
   $('#n-items').textContent = D.n.items;
   $('#view-terms').innerHTML = '<div class="grid" style="margin-top:18px">' + D.terms.map(([ko, en, text]) => '<div class="term" data-hay="' + esc((ko + ' ' + en + ' ' + text).toLowerCase()) + '"><b>' + esc(ko) + '</b><span class="en">' + esc(en) + '</span><div>' + esc(text) + '</div></div>').join('') + '</div>';
-  $('#pick-list').innerHTML = COSTS.map((n) => '<div class="block"><p class="pgroup"><span class="swatch" style="background:var(--c' + n + ')"></span>' + n + '코스트</p><div class="pgrid">' + D.champs.filter((c) => c.cost === n).map((c) => '<button type="button" class="pick k' + n + '" draggable="true" data-key="' + esc(c.en) + '" data-cost="' + n + '" data-traits="' + esc(c.traits.map((x) => x.en).join('|')) + '" data-hay="' + esc([c.ko, c.en, c.traits.map((x) => x.ko + ' ' + x.en).join(' ')].join(' ').toLowerCase()) + '" title="' + esc(c.ko + ' · ' + c.traits.map((x) => x.ko).join(' · ')) + '"><span class="pf">' + spr('sq', c.img) + '</span><span class="nm">' + esc(c.ko) + '</span></button>').join('') + '</div></div>').join('');
+  $('#pick-list').innerHTML = COSTS.map((n) => '<div class="block"><p class="pgroup"><span class="swatch" style="background:var(--c' + n + ')"></span>' + n + '코스트</p><div class="pgrid">' + D.champs.filter((c) => c.cost === n).map((c) => '<button type="button" class="pick k' + n + '" data-key="' + esc(c.en) + '" data-cost="' + n + '" data-traits="' + esc(c.traits.map((x) => x.en).join('|')) + '" data-hay="' + esc([c.ko, c.en, c.traits.map((x) => x.ko + ' ' + x.en).join(' ')].join(' ').toLowerCase()) + '" title="' + esc(c.ko + ' · ' + c.traits.map((x) => x.ko).join(' · ')) + '"><span class="pf">' + spr('sq', c.img) + '</span><span class="nm">' + esc(c.ko) + '</span><span class="pt">' + c.traits.map((x) => spr('trait', TR[x.en] ? TR[x.en].icon : -1)).join('') + '</span></button>').join('') + '</div></div>').join('');
+  $('#tfilter').innerHTML = D.traits.filter((x) => x.kind !== 'unique').map((x) => '<button type="button" class="tf" data-dtrait="' + esc(x.en) + '">' + spr('trait', x.icon) + esc(x.ko) + '</button>').join('');
   $('#n-champs').textContent = D.champs.length;
   $('#n-traits').textContent = D.traits.length;
   $('#sub').textContent = '세트 19 프리즈매틱 투어 · 챔피언 ' + D.champs.length + '명 · 시너지 ' + D.traits.length + '개 · 증강 ' + D.n.augNames + '개 · 아이템 ' + D.n.items + '개 · PBE 19.1 · 2026-11-18 기준';
@@ -583,9 +624,13 @@ function syncBar() { document.documentElement.style.setProperty('--bar-h', docum
 window.addEventListener('resize', syncBar);
 document.addEventListener('click', (e) => {
   const hex = e.target.closest('.hex');
-  if (hex) { hexClick(Number(hex.dataset.pos)); return; }
+  if (hex) { if (!swallowClick()) hexClick(Number(hex.dataset.pos)); return; }
   const pk = e.target.closest('.pick');
-  if (pk) { togglePick(pk.dataset.key); return; }
+  if (pk) { if (!swallowClick()) togglePick(pk.dataset.key); return; }
+  const sb = e.target.closest('[data-star]');
+  if (sb) { const u = unitAt(dsel); if (u) { u.star = Number(sb.dataset.star); renderDeck(true); } return; }
+  const as = e.target.closest('[data-allstar]');
+  if (as) { deck.units.forEach((u) => { u.star = Number(as.dataset.allstar); }); renderDeck(true); return; }
   const ai = e.target.closest('[data-ai]');
   if (ai) { toast('계산 중…'); setTimeout(() => runSuggest(ai.dataset.ai), 30); return; }
   const add = e.target.closest('[data-add]');
@@ -671,7 +716,7 @@ function renderDeck(announce) {
     for (let col = 0; col < COLS; col++) {
       const pos = r * COLS + col, u = unitAt(pos), c = u && CH[u.c];
       h += u
-        ? '<button type="button" class="hex has k' + c.cost + (pos === dsel ? ' sel' : '') + (pos === popAt ? ' pop' : '') + '" data-pos="' + pos + '" draggable="true" title="' + esc(c.ko) + ' (' + esc(c.en) + ')" aria-label="' + esc(c.ko) + ' ' + u.star + '성"><span class="face">' + spr('sq', c.img) + '</span>' + (u.star > 1 ? '<span class="st">' + '★'.repeat(u.star) + '</span>' : '') + '</button>'
+        ? '<button type="button" class="hex has k' + c.cost + (pos === dsel ? ' sel' : '') + (pos === popAt ? ' pop' : '') + '" data-pos="' + pos + '" title="' + esc(c.ko) + ' · 누르면 빠짐 · 끌면 이동 · 오른쪽 클릭: 별 레벨" aria-label="' + esc(c.ko) + ' ' + u.star + '성"><span class="face">' + spr('sq', c.img) + '</span>' + (u.star > 1 ? '<span class="st">' + '★'.repeat(u.star) + '</span>' : '') + '<span class="hn">' + esc(c.ko) + '</span></button>'
         : '<button type="button" class="hex" data-pos="' + pos + '" aria-label="빈 칸"><span class="face"></span></button>';
     }
     h += '</div>';
@@ -692,9 +737,9 @@ function renderDeck(announce) {
     bar.hidden = false;
     bar.className = 'unit-bar k' + c.cost;
     bar.innerHTML = spr('sq', c.img) + '<span class="who"><b>' + esc(c.ko) + ' ' + '★'.repeat(su.star) + '</b><span>' + c.cost + '코스트 · ' + c.traits.map((x) => esc(x.ko)).join(' · ') + '</span></span>'
-      + '<button class="btn" type="button" data-act="star">별 ' + (su.star % 3 + 1) + '개로</button>'
+      + '<span class="seg" role="group" aria-label="별 레벨">' + [1, 2, 3].map((n) => '<button type="button" data-star="' + n + '" aria-pressed="' + (su.star === n) + '">' + '★'.repeat(n) + '</button>').join('') + '</span>'
       + '<button class="btn" type="button" data-go="champs" data-key="' + esc(c.en) + '" data-q="' + esc(c.ko) + '">설명</button>'
-      + '<button class="btn" type="button" data-act="remove">빼기</button>';
+      + '<button class="btn" type="button" data-act="remove">빼기</button><button class="btn" type="button" data-act="desel" aria-label="닫기">닫기</button>';
   } else bar.hidden = true;
 
   const rank = {};
@@ -722,15 +767,18 @@ function renderDeck(announce) {
   document.querySelectorAll('.pick').forEach((b) => b.classList.toggle('in', !!onBoard[b.dataset.key]));
   $('#pick-note').innerHTML = dtrait && TR[dtrait]
     ? '<span><b>' + esc(TR[dtrait].ko) + '</b> 챔피언만 보는 중</span><button class="btn" type="button" data-dtrait="' + esc(dtrait) + '">전체 보기</button>'
-    : '챔피언을 누르면 판에 올라가고, 다시 누르면 내려갑니다. 판 아래 특성 이름을 누르면 그 특성 챔피언만 보입니다.';
+    : '누르면 올라가고 다시 누르면 내려갑니다. 검색어를 치고 Enter를 누르면 맨 앞 챔피언이 바로 올라갑니다.';
+  document.querySelectorAll('.tf').forEach((b) => b.classList.toggle('on', b.dataset.dtrait === dtrait));
   renderScore();
   saveDeck();
+  $('#btn-undo').disabled = hist.length < 2;
 }
 function hexClick(pos) {
   const u = unitAt(pos), su = unitAt(dsel);
   if (su && pos !== dsel) { if (u) u.pos = dsel; su.pos = pos; dsel = -1; popAt = pos; }
-  else if (u) dsel = dsel === pos ? -1 : pos;
-  renderDeck(false);
+  else if (u) { deck.units = deck.units.filter((x) => x !== u); dsel = -1; }
+  else return;
+  renderDeck(true);
 }
 function togglePick(en) {
   const u = deck.units.find((x) => x.c === en);
@@ -763,22 +811,24 @@ function deckAct(a) {
   if (a === 'lv-') deck.lv = Math.max(1, deck.lv - 1);
   else if (a === 'lv+') deck.lv = Math.min(10, deck.lv + 1);
   else if (a === 'clear') { deck.units = []; deck.emb = {}; dsel = -1; deck.name = ''; $('#deck-name').value = ''; $('#ai-out').textContent = ''; }
-  else if (a === 'star' && su) su.star = su.star % 3 + 1;
+  else if (a === 'undo') { if (hist.length < 2) { toast('되돌릴 것이 없습니다'); return; } hist.pop(); decodeDeck(hist[hist.length - 1], true); dsel = -1; }
+  else if (a === 'desel') dsel = -1;
   else if (a === 'remove' && su) { deck.units = deck.units.filter((u) => u !== su); dsel = -1; }
   else if (a === 'random') randomDeck();
   else if (a === 'share') { shareDeck(); return; }
-  renderDeck(a === 'star' || a === 'random');
+  renderDeck(a === 'random');
 }
 // Deck code: 'a' + level + per unit (champion 2 chars, hex 1, star 1) [+ '.' emblems] [+ '~' name]
 const b36 = (n, w) => n.toString(36).padStart(w, '0');
-function encodeDeck() {
+const hist = [];
+function encodeDeck(noName) {
   let s = 'a' + b36(deck.lv, 1) + deck.units.map((u) => b36(CH[u.c].img, 2) + b36(u.pos, 1) + u.star).join('');
   const emb = Object.keys(deck.emb).filter((en) => deck.emb[en] > 0 && TR[en]).map((en) => b36(TR[en].icon, 2) + b36(Math.min(deck.emb[en], 9), 1)).join('');
   if (emb) s += '.' + emb;
-  if (deck.name) s += '~' + encodeURIComponent(deck.name);
+  if (deck.name && !noName) s += '~' + encodeURIComponent(deck.name);
   return s;
 }
-function decodeDeck(s) {
+function decodeDeck(s, keepName) {
   try {
     if (!s || s[0] !== 'a') return false;
     let name = '';
@@ -794,11 +844,15 @@ function decodeDeck(s) {
       const tr = BYICON[parseInt(emb.slice(i, i + 2), 36)], n = parseInt(emb[i + 2], 36);
       if (tr && n > 0) e[tr.en] = n;
     }
-    deck.lv = lv >= 1 && lv <= 10 ? lv : 8; deck.units = units; deck.emb = e; deck.name = name;
+    deck.lv = lv >= 1 && lv <= 10 ? lv : 8; deck.units = units; deck.emb = e; if (!keepName) deck.name = name;
     return true;
   } catch (err) { return false; }
 }
-function saveDeck() { try { localStorage.setItem('tft19deck', encodeDeck()); } catch (e) { /* storage may be unavailable */ } }
+function saveDeck() {
+  const code = encodeDeck(true);
+  if (hist[hist.length - 1] !== code) { hist.push(code); if (hist.length > 80) hist.shift(); }
+  try { localStorage.setItem('tft19deck', encodeDeck()); } catch (e) { /* storage may be unavailable */ }
+}
 function shareDeck() {
   const code = encodeDeck(), url = location.href.split('#')[0] + '#deck=' + code;
   const done = () => toast('덱 링크를 복사했습니다');
@@ -822,41 +876,90 @@ function initDeck() {
   $('#deck-name').value = deck.name;
   $('#deck-name').addEventListener('input', (e) => { deck.name = e.target.value; saveDeck(); });
 }
-document.addEventListener('dragstart', (e) => {
-  if (!e.target.closest) return;
-  const hx = e.target.closest('.hex.has'), pk = e.target.closest('.pick');
-  if (hx) drag = { from: Number(hx.dataset.pos) }; else if (pk) drag = { en: pk.dataset.key }; else return;
-  try { e.dataTransfer.setData('text/plain', 'unit'); e.dataTransfer.effectAllowed = 'move'; } catch (err) { /* ignore */ }
+let pd = null, skipUntil = 0, skipNext = false;
+const swallowClick = () => { if (skipNext || Date.now() < skipUntil) { skipNext = false; return true; } return false; };
+document.addEventListener('pointerdown', (e) => {
+  if (e.button > 0 || !e.target.closest) return;
+  skipNext = false;
+  const hx = e.target.closest('.hex.has'), pk = e.pointerType === 'mouse' ? e.target.closest('.pick') : null;
+  if (!hx && !pk) return;
+  const from = hx ? Number(hx.dataset.pos) : null;
+  pd = { from, en: hx ? unitAt(from).c : pk.dataset.key, x: e.clientX, y: e.clientY, moved: false };
+  // holding still on a unit opens its star / info bar instead of removing it
+  if (hx) pd.timer = setTimeout(() => { if (pd && !pd.moved) { dsel = pd.from; skipNext = true; pd = null; renderDeck(false); } }, 450);
 });
-document.addEventListener('dragover', (e) => {
-  const hx = drag && e.target.closest && e.target.closest('.hex');
+document.addEventListener('pointermove', (e) => {
+  if (!pd) return;
+  if (!pd.moved) {
+    if (Math.hypot(e.clientX - pd.x, e.clientY - pd.y) < 8) return;
+    pd.moved = true;
+    clearTimeout(pd.timer);
+    const c = CH[pd.en];
+    pd.ghost = document.createElement('div');
+    pd.ghost.className = 'ghost k' + c.cost;
+    pd.ghost.innerHTML = spr('sq', c.img);
+    document.body.appendChild(pd.ghost);
+    const src = pd.from != null && document.querySelector('.hex[data-pos="' + pd.from + '"]');
+    if (src) src.classList.add('lift');
+  }
+  pd.ghost.style.left = e.clientX + 'px';
+  pd.ghost.style.top = e.clientY + 'px';
+  const el = document.elementFromPoint(e.clientX, e.clientY), hx = el && el.closest('.hex');
+  document.querySelectorAll('.hex.over').forEach((x) => { if (x !== hx) x.classList.remove('over'); });
+  if (hx) hx.classList.add('over');
+});
+function endDrag(e, cancel) {
+  if (!pd) return;
+  clearTimeout(pd.timer);
+  const p = pd;
+  pd = null;
+  if (p.ghost) p.ghost.remove();
+  document.querySelectorAll('.hex.over, .hex.lift').forEach((x) => x.classList.remove('over', 'lift'));
+  if (!p.moved || cancel) return;
+  skipUntil = Date.now() + 80;
+  const el = document.elementFromPoint(e.clientX, e.clientY), hx = el && el.closest('.hex');
+  if (hx) {
+    const pos = Number(hx.dataset.pos), there = unitAt(pos);
+    if (p.from != null) {
+      const mover = unitAt(p.from);
+      if (mover && pos !== p.from) { if (there) there.pos = p.from; mover.pos = pos; popAt = pos; }
+    } else {
+      const mine = deck.units.find((u) => u.c === p.en);
+      if (mine) { if (there && there !== mine) there.pos = mine.pos; mine.pos = pos; popAt = pos; }
+      else { if (there) deck.units = deck.units.filter((u) => u !== there); addUnit(p.en, pos); }
+    }
+  } else if (p.from != null && !(el && el.closest('#board'))) {
+    const mover = unitAt(p.from);
+    deck.units = deck.units.filter((u) => u !== mover);   // dragged off the board
+  } else return;
+  dsel = -1;
+  renderDeck(true);
+}
+document.addEventListener('pointerup', (e) => endDrag(e, false));
+document.addEventListener('pointercancel', (e) => endDrag(e, true));
+document.addEventListener('contextmenu', (e) => {
+  const hx = e.target.closest && e.target.closest('.hex.has');
   if (!hx) return;
   e.preventDefault();
-  document.querySelectorAll('.hex.over').forEach((x) => { if (x !== hx) x.classList.remove('over'); });
-  hx.classList.add('over');
+  dsel = Number(hx.dataset.pos);
+  renderDeck(false);
 });
-document.addEventListener('drop', (e) => {
-  const hx = drag && e.target.closest && e.target.closest('.hex');
-  if (!hx) { drag = null; return; }
-  e.preventDefault();
-  const pos = Number(hx.dataset.pos), there = unitAt(pos);
-  if (drag.from != null) {
-    const mover = unitAt(drag.from);
-    if (mover && pos !== drag.from) { if (there) there.pos = drag.from; mover.pos = pos; popAt = pos; }
-  } else {
-    const mine = deck.units.find((u) => u.c === drag.en);
-    if (mine) { if (there && there !== mine) there.pos = mine.pos; mine.pos = pos; popAt = pos; }
-    else { if (there) deck.units = deck.units.filter((u) => u !== there); addUnit(drag.en, pos); }
-  }
-  drag = null; dsel = -1;
-  renderDeck(true);
-});
-document.addEventListener('dragend', () => { drag = null; document.querySelectorAll('.hex.over').forEach((x) => x.classList.remove('over')); });
 document.addEventListener('keydown', (e) => {
-  if (state.tab !== 'deck' || dsel < 0 || /INPUT|TEXTAREA/.test(document.activeElement.tagName)) return;
+  if (state.tab !== 'deck') return;
+  const typing = /INPUT|TEXTAREA/.test(document.activeElement.tagName);
+  if (e.key === 'Enter' && document.activeElement === $('#q')) {
+    const first = [...document.querySelectorAll('.pick:not(.in)')].find((b) => b.getClientRects().length);
+    if (first && state.q.trim()) { e.preventDefault(); togglePick(first.dataset.key); $('#q').select(); }
+    return;
+  }
+  if (typing) return;
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') { e.preventDefault(); deckAct('undo'); return; }
+  const su = unitAt(dsel);
+  if (!su) return;
   if (e.key === 'Delete' || e.key === 'Backspace') { e.preventDefault(); deckAct('remove'); }
+  else if (e.key === 'Escape') deckAct('desel');
+  else if (e.key === '1' || e.key === '2' || e.key === '3') { su.star = Number(e.key); renderDeck(true); }
 });
-
 // ── Deck scoring and recommended decks (estimates, not statistics) ───────────────────────────
 // A unit is worth (cost value x star value). Tanks carry the defence score, carries the offence score.
 // Active traits add "% more damage" / "% more effective health" to the units they reach (see D.traits[].rate).
